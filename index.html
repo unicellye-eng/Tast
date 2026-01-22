@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+
+<html class="dark" dir="rtl" lang="ar">
+<head>
+<meta content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; media-src 'self'; connect-src 'self'; font-src 'self' data:; manifest-src 'self'; worker-src 'self'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; object-src 'none'" http-equiv="Content-Security-Policy"/>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<meta content="استمع لأجمل الرنات وميّز مكالماتك بنغمة مختلفة" name="description"/>
+<meta content="#1565C0" name="theme-color"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<meta content="النغمات" name="apple-mobile-web-app-title">
+<link href="./manifest.json" rel="manifest"/>
+<link href="./icon-192.png" rel="icon" type="image/png"/>
+<link href="./icon-192.png" rel="apple-touch-icon"/>
+<link href="./styles.css" rel="stylesheet"/>
+</meta><title>سمّع متصليك – أجمل الرنات</title><meta content="سمّع متصليك – أجمل الرنات" property="og:title"/><meta content="استمع لأجمل الرنات وميّز مكالماتك بنغمة مختلفة" property="og:description"/><meta content="سمّع متصليك – أجمل الرنات" name="twitter:title"/><meta content="استمع لأجمل الرنات وميّز مكالماتك بنغمة مختلفة" name="twitter:description"/></head>
+<body>
+<header class="app-header safe-top">
+<div class="header-inner">
+<button aria-label="رجوع" class="icon-btn hidden" id="backBtn">
+<span class="chev">›</span>
+</button>
+<div class="brand">
+<img alt="Logo" class="logo" id="headerLogo" src="./icon-192.png"/>
+<h1 class="offset-right-title header-title center-title" id="headerTitle">استمع واختر نغمتك</h1>
+</div>
+<button aria-label="بحث" class="icon-btn hidden" id="searchBtn">
+<span class="search-ic">⌕</span>
+</button>
+<!-- Install mini card (hidden by default حتى لو CSS/JS ما انحمل) -->
+<div aria-live="polite" class="install-card hidden" id="installBar" style="display:none">
+<div class="install-card-text">ثبّت التطبيق</div>
+<div class="install-card-actions">
+<button class="btn primary btn-sm" id="installBtn">تثبيت</button>
+<button class="btn ghost btn-sm" id="installLater">لاحقًا</button>
+</div>
+</div>
+</div>
+</header>
+<main class="app-main safe-bottom">
+<!-- Categories -->
+<section class="view" id="viewCategories">
+<div class="pad">
+<div class="cats-grid" id="categoriesGrid"></div>
+</div>
+<footer class="footer">
+<div class="footer-card">
+<div class="footer-title">للتواصل</div>
+<div class="contact-cards" id="contactLinks"></div>
+<div class="social-row" id="socialLinks"></div>
+</div>
+</footer>
+</section>
+<!-- List -->
+<section class="view hidden" id="viewList">
+<div class="pad">
+<div class="search-bar hidden" id="searchBar">
+<input autocomplete="off" class="search-input" id="searchInput" placeholder="ابحث عن نغمة..." type="search"/>
+<button aria-label="مسح" class="icon-btn" id="searchClear">✕</button>
+</div>
+<div class="list" id="listGrid"></div>
+</div>
+</section>
+<!-- Details -->
+<section class="view hidden" id="viewDetails">
+<div class="pad">
+<div class="details-card">
+<img alt="" class="details-img" id="detailsImage"/>
+<div class="details-name" id="detailsName"></div>
+<div class="subs" id="subsGrid"></div>
+<div class="toast hidden" id="toast"></div>
+</div>
+<div class="hint"></div>
+</div>
+</section>
+</main>
+<div class="offline hidden" id="offlineHint">⚠️ لا يوجد اتصال بالإنترنت</div>
+<!-- (تم نقل بطاقة التثبيت للأعلى بجوار العنوان) -->
+<script defer="" src="./data.js"></script>
+<script defer="" src="./app.js"></script>
+<script defer="" src="./register-sw.js"></script>
+</body>
+</html>
