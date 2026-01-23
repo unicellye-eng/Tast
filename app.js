@@ -1,4 +1,106 @@
-(() => {
+(async () => {
+// === Data source (Google Sheet first, fallback to data.js) ===
+async function __fetchJsonWithTimeout(url, ms=5000){
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), ms);
+  try{
+    const res = await fetch(url, { signal: ctrl.signal, cache: "no-store" });
+    if(!res.ok) throw new Error("HTTP " + res.status);
+    return await res.json();
+  } finally {
+    clearTimeout(t);
+  }
+}
+
+function __toStr(v){ return (v==null) ? "" : String(v).trim(); }
+function __toNum(v){
+  if(v==null) return null;
+  const s = String(v).trim();
+  if(!s) return null;
+  const n = Number(s);
+  return Number.isFinite(n) ? n : null;
+}
+
+// Default categories (used if data.js not present)
+function __ensureCategories(){
+  if (Array.isArray(window.CATEGORIES) && window.CATEGORIES.length) return;
+  window.CATEGORIES = [
+    { id:"latest", name:"الأحدث", image:"ringtones/images/cat-latest.webp" },
+    { id:"popular", name:"الأكثر تحميلا", image:"ringtones/images/cat-popular.webp" },
+    { id:"duas", name:"أدعية", image:"ringtones/images/cat-duas.webp" },
+    { id:"nasheeds", name:"أناشيد", image:"ringtones/images/cat-nasheeds.webp" },
+    { id:"songs", name:"أغاني", image:"ringtones/images/cat-songs.webp" },
+    { id:"zawamel", name:"زوامل", image:"ringtones/images/cat-zawamel.webp" },
+    { id:"name_replies", name:"رد على الاسم", image:"ringtones/images/cat-name.webp" },
+    { id:"sports", name:"رياضية", image:"ringtones/images/cat-sports.webp" },
+    { id:"misc", name:"متنوع", image:"ringtones/images/cat-misc.webp" }
+  ];
+}
+
+async function __maybeLoadFromSheet(){
+  try{
+    const cfg = window.SHEET_CONFIG || {};
+    if(!cfg.enabled) return false;
+
+    const baseUrl = cfg.baseUrl || "https://opensheet.elk.sh";
+    const sheetId = cfg.sheetId;
+    const tab = cfg.tab || "ringtones";
+    if(!sheetId) return false;
+
+    const url = `${baseUrl.replace(/\/$/,'')}/${encodeURIComponent(sheetId)}/${encodeURIComponent(tab)}`;
+    const rows = await __fetchJsonWithTimeout(url, cfg.timeoutMs || 6000);
+
+    if(!Array.isArray(rows) || rows.length === 0) return false;
+
+    // Map sheet rows -> ringtone objects the app expects
+    const mapped = rows.map(r => {
+      const obj = {
+        id: __toStr(r.id) || __toStr(r.source_id),
+        source_id: __toStr(r.source_id) || __toStr(r.id),
+        title: __toStr(r.title),
+        categories: __toStr(r.categories),
+        audio: __toStr(r.audio),
+        image: __toStr(r.image),
+        code_yemen: __toStr(r.code_yemen),
+        code_sabafon: __toStr(r.code_sabafon),
+        code_you: __toStr(r.code_you),
+        created_at: __toStr(r.created_at) || __toStr(r.createdAt),
+        is_active: __toStr(r.is_active) || "1",
+        // ranks
+        rank_latest: __toNum(r.rank_latest),
+        rank_popular: __toNum(r.rank_popular),
+        rank_duas: __toNum(r.rank_duas),
+        rank_nasheeds: __toNum(r.rank_nasheeds),
+        rank_songs: __toNum(r.rank_songs),
+        rank_zawamel: __toNum(r.rank_zawamel),
+        rank_name_duas: __toNum(r.rank_name_duas),
+        rank_name_replies: __toNum(r.rank_name_replies),
+        rank_sports: __toNum(r.rank_sports),
+        rank_misc: __toNum(r.rank_misc),
+      };
+      // Keep any extra fields as-is (safe)
+      for (const k in r){
+        if (!(k in obj)) obj[k] = r[k];
+      }
+      return obj;
+    }).filter(x => x.id);
+
+    window.RINGTONES = mapped;
+    window.__DATA_SOURCE = "sheet";
+    return true;
+  }catch(e){
+    // Fallback to data.js
+    window.__DATA_SOURCE = "data";
+    return false;
+  }
+}
+
+__ensureCategories();
+// If sheet is enabled, try it first; otherwise use existing window.RINGTONES (from data.js).
+await __maybeLoadFromSheet();
+if (!Array.isArray(window.RINGTONES)) window.RINGTONES = window.RINGTONES || [];
+// === End data source bootstrap ===
+
 
 // === Icon helpers (avoid colored emoji on Android) ===
 const LAST_PLAYED_KEY = "alooh:lastPlayedId";
