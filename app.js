@@ -389,10 +389,48 @@ function setPauseIcon(btn) {
     const obj = (r && typeof r === "object") ? r : {};
     const id = obj.id ?? obj._id ?? obj.uuid ?? String(Math.random());
     const title = String(obj.title ?? obj.name ?? "").trim();
-    const audio = String(obj.audio ?? obj.audioUrl ?? obj.url ?? "").trim();
-    const image = String(obj.image ?? obj.img ?? obj.cover ?? "").trim();
-    const categories = Array.isArray(obj.categories) ? obj.categories.filter(Boolean).map(String) : [];
-    const rank = (obj.rank && typeof obj.rank === "object") ? obj.rank : {};
+
+    // audio/image may come as just a filename from the Sheet
+    let audio = String(obj.audio ?? obj.audioUrl ?? obj.url ?? "").trim();
+    let image = String(obj.image ?? obj.img ?? obj.cover ?? "").trim();
+
+    // Normalize categories:
+    // - From data.js: could be an array
+    // - From Sheet: often a string like "popular|zawamel"
+    let categories = [];
+    if (Array.isArray(obj.categories)) {
+      categories = obj.categories.filter(Boolean).map(v => String(v).trim()).filter(Boolean);
+    } else if (typeof obj.categories === "string") {
+      categories = obj.categories
+        .split(/[|,]/g)
+        .map(s => s.trim())
+        .filter(Boolean);
+    }
+
+    // Build rank object from either obj.rank or rank_* columns
+    const rank = (obj.rank && typeof obj.rank === "object") ? { ...obj.rank } : {};
+    const rankKeys = [
+      "latest","popular","duas","nasheeds","songs","zawamel","name_duas","name_replies","sports","misc"
+    ];
+    for (const k of rankKeys) {
+      const col = "rank_" + k;
+      if (rank[k] == null && obj[col] != null && obj[col] !== "") {
+        const n = Number(obj[col]);
+        if (!Number.isNaN(n)) rank[k] = n;
+      }
+    }
+
+    // If audio is just "file.mp3" (no slash), prefix it to the real folder
+    // (Your files live in: ringtones/audio/ and ringtones/images/)
+    const isUrl = (v) => /^https?:\/\//i.test(v);
+    if (audio && !isUrl(audio) && !audio.includes("/")) {
+      audio = "ringtones/audio/" + audio;
+    }
+    // Some sheets have image="AUTO" or empty, keep it as-is (the UI will generate a fallback)
+    if (image && image !== "AUTO" && !isUrl(image) && !image.includes("/")) {
+      image = "ringtones/images/" + image;
+    }
+
     return {
       ...obj,
       id,
