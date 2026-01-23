@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>لوحة ترتيب النغمات</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; margin:16px; background:#0b1020; color:#e9ecf1}
+    .card{background:#141b2e; border:1px solid #24304f; border-radius:12px; padding:12px; margin-bottom:12px}
+    input,select,button{font:inherit}
+    input{background:#0f162a; border:1px solid #2a3962; color:#e9ecf1; padding:8px; border-radius:10px}
+    button{background:#2b6cff; border:none; color:white; padding:10px 12px; border-radius:10px; cursor:pointer}
+    button.secondary{background:#22304f}
+    button.danger{background:#b42318}
+    .row{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+    .grow{flex:1}
+    table{width:100%; border-collapse:collapse}
+    th,td{border-bottom:1px solid #24304f; padding:8px; text-align:right; vertical-align:top}
+    th{position:sticky; top:0; background:#141b2e}
+    .small{font-size:12px; opacity:.85}
+    .tag{display:inline-block; padding:2px 8px; border:1px solid #2a3962; border-radius:999px; margin:2px}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="row">
+      <div class="grow">
+        <h2 style="margin:0 0 6px 0;">لوحة ترتيب النغمات (تعديل data.js بسهولة)</h2>
+        <div class="small">هذه الصفحة تعمل داخل موقعك. تعدّل الترتيب ثم تضغط "تحميل data.js" وترفعه على GitHub.</div>
+      </div>
+      <button id="downloadBtn">تحميل data.js</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <input id="search" class="grow" placeholder="ابحث باسم النغمة..." />
+      <select id="catSelect"></select>
+      <button class="secondary" id="renumberBtn">إعادة ترقيم هذا القسم</button>
+    </div>
+    <div class="small" style="margin-top:8px">
+      * ملاحظة: ظهور النغمة في أي قسم يعتمد على رقمها في ذلك القسم. الرقم 1 = أول نغمة.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="small" style="margin-bottom:8px">تلميح: يمكنك تعديل اسم النغمة (title) أو مسار الصوت/الصورة. إذا كتبت فقط اسم الملف (مثل mp3)، سيتم افتراض المسار داخل ringtones/audio و ringtones/images.</div>
+    <div style="max-height:70vh; overflow:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:110px">ID</th>
+            <th>الاسم (title)</th>
+            <th style="width:170px">الصوت</th>
+            <th style="width:170px">الصورة</th>
+            <th style="width:140px">ترتيب القسم</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="./data.js"></script>
+  <script src="./admin.js"></script>
+</body>
+</html>

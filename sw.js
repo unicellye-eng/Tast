@@ -5,7 +5,7 @@
    - الصور/الصوت: Cache First (تسريع) + يتم حفظ ما يفتحه المستخدم فقط (لن يحمل 3000 ملف دفعة واحدة)
 */
 
-const VERSION = "v3"; // غيّر الرقم عند أي تعديل جديد (v4, v5...)
+const VERSION = "v4-auto"; // غيّر الرقم عند أي تعديل جديد (v4, v5...)
 const STATIC_CACHE = `static-${VERSION}`;
 const RUNTIME_CACHE = `runtime-${VERSION}`;
 
@@ -143,3 +143,11 @@ self.addEventListener("message", (event) => {
     );
   }
 });
+// Allow the page to trigger immediate activation of a new worker
+self.addEventListener('message', (event) => {
+  if (event && event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
+
